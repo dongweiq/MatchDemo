@@ -1,0 +1,64 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "$string:app_name"
+    },
+    {
+      "name": "cancel",
+      "value": "取消"
+    },
+    {
+      "name": "confirm",
+      "value": "确定"
+    },
+    {
+      "name": "tip",
+      "value": "提示"
+    },
+    {
+      "name": "browser",
+      "value": "浏览器"
+    },
+    {
+      "name": "photo_viewer",
+      "value": "图片阅览器"
+    },
+    {
+      "name": "preparing",
+      "value": "准备中"
+    },
+    {
+      "name": "prepare_success",
+      "value": "准备成功"
+    },
+    {
+      "name": "prepare_failure",
+      "value": "准备失败"
+    },
+    {
+      "name": "saving",
+      "value": "保存中"
+    },
+    {
+      "name": "save_success",
+      "value": "成功保存"
+    },
+    {
+      "name": "save_failure",
+      "value": "保存失败"
+    },
+    {
+      "name": "main_title",
+      "value": "标题"
+    }
+  ]
+}

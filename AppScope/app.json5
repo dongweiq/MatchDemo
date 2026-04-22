@@ -1,0 +1,10 @@
+{
+  "app": {
+    "bundleName": "com.lwi.match_demo",
+    "vendor": "lwi",
+    "versionCode": 20260421,
+    "versionName": "1.0.0",
+    "icon": "$media:app_icon",
+    "label": "$string:app_name"
+  }
+}
