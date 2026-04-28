@@ -14,6 +14,11 @@
       "name": "LHDialogContainer",
       "pageSourceFile": "src/main/ets/pages/common/dialogcontainer/LHDialogContainer.ets",
       "buildFunction": "LHDialogContainerBuilder"
+    },
+    {
+      "name": "Classroom",
+      "pageSourceFile": "src/main/ets/pages/classroom/Classroom.ets",
+      "buildFunction": "ClassroomBuilder"
     }
   ]
 }

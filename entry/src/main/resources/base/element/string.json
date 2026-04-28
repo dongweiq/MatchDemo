@@ -71,6 +71,10 @@
     {
       "name": "home_tab_settings",
       "value": "设置"
+    },
+    {
+      "name": "lesson_big_ben",
+      "value": "伦敦-大本钟"
     }
   ]
 }

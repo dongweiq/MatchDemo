@@ -1,6 +1,7 @@
 import { LHAppSettingsTextSizePlanModel } from "../../../models/common/LHAppSettingsTextSizePlanModel";
 import { LHCommonTitleBar } from "../../../views/common/LHCommonTitleBar";
 import { HomeMainTabBarBuilder } from '../../../views/HomeMainTabBarBuilder';
+import { HomeTabLessonsContent } from "../../../views/HomeTabLessonsContent";
 
 /**
  * 首页 - 课程。
@@ -37,13 +38,21 @@ export struct HomeTabLessons {
   @Builder
   private Content() {
     Column() {
-      LHCommonTitleBar({
-        centerTitleText: $r('app.string.home_tab_lessons'),
-        centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize
+      Column() {
+        LHCommonTitleBar({
+          centerTitleText: $r('app.string.home_tab_lessons'),
+          centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize,
+          titleBarBg: Color.Transparent
+        })
+      }
+      .width('100%')
+      .padding({ top: this.topSafeZoneHeightVp })
+      .backgroundColor($r('app.color.main_selected_light_color'))
+      HomeTabLessonsContent({
+        appTextSizePlan: this.appTextSizePlan
       })
     }
     .width('100%')
     .height('100%')
-    .margin({ top: this.topSafeZoneHeightVp })
   }
 }

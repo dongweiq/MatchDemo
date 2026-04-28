@@ -149,6 +149,7 @@ struct HomeMain {
     .hideToolBar(true)
     .hideBackButton(true)
     .mode(this.navMode)
+    .backgroundColor($r('app.color.main_bg_gray_color'))
     .onAppear(() => {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;
       mainWindow.setWindowLayoutFullScreen(true).catch(() => {});

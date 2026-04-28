@@ -37,13 +37,18 @@ export struct HomeTabSettings {
   @Builder
   private Content() {
     Column() {
-      LHCommonTitleBar({
-        centerTitleText: $r('app.string.home_tab_settings'),
-        centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize
-      })
+      Column() {
+        LHCommonTitleBar({
+          centerTitleText: $r('app.string.home_tab_settings'),
+          centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize,
+          titleBarBg: Color.Transparent
+        })
+      }
+      .width('100%')
+      .padding({ top: this.topSafeZoneHeightVp })
+      .backgroundColor($r('app.color.main_selected_light_color'))
     }
     .width('100%')
     .height('100%')
-    .margin({ top: this.topSafeZoneHeightVp })
   }
 }
