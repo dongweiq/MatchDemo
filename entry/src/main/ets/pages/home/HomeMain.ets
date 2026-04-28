@@ -16,8 +16,9 @@ import {
 import window from '@ohos.window';
 import { ScreenObserver, ScreenStatusInfo } from '../../utils/common/uiobserver/ScreenObserver';
 import { LHAppSettingsTextSizePlanModel } from '../../models/common/LHAppSettingsTextSizePlanModel';
-import { LHCommonTitleBar } from '../../views/common/LHCommonTitleBar';
-import { LHWebBrowser } from '../common/webbrowser/LHWebBrowser';
+import { HomeTabLessons } from './hometabs/HomeTabLessons';
+import { HomeTabNote } from './hometabs/HomeTabNote';
+import { HomeTabSettings } from './hometabs/HomeTabSettings';
 
 /**
  * 事件：物理返回键额外监听。
@@ -36,6 +37,12 @@ struct HomeMain {
 
   /** 应用文字字号方案。 */
   @State appTextSizePlan: LHAppSettingsTextSizePlanModel = AppSettings.textSizePlan();
+
+  /** 当前选中的标签序号。 */
+  @State curSelectedTabIndex: number = 0;
+
+  /** 标签页控制器。 */
+  private tabsController: TabsController = new TabsController();
 
   /** 页面栈控制器。 */
   private routerStack: NavPathStack = new NavPathStack();
@@ -107,41 +114,40 @@ struct HomeMain {
 
   build() {
     Navigation(this.routerStack) {
-      Column() {
-        LHCommonTitleBar({
-          centerTitleText: $r('app.string.main_title'),
-          centerTitleColor: Color.White,
-          centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize,
-          titleBarBg: $r('app.color.main_selected_light_color')
+      Tabs({
+        barPosition: BarPosition.End,
+        index: this.curSelectedTabIndex,
+        controller: this.tabsController
+      }) {
+        HomeTabLessons({
+          selectedIndex: this.curSelectedTabIndex,
+          appTextSizePlan: this.appTextSizePlan,
+          topSafeZoneHeightVp: this.topSafeZoneHeightVp
         })
-        Column() {
-          Button('Test').onClick((_: ClickEvent) => {
-            LHWebBrowser.go({
-              'url_params': 'https://www.baidu.com'
-            });
-          })
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .backgroundColor(Color.White)
-        .justifyContent(FlexAlign.Center)
-        .alignItems(HorizontalAlign.Center)
+        HomeTabNote({
+          selectedIndex: this.curSelectedTabIndex,
+          appTextSizePlan: this.appTextSizePlan,
+          topSafeZoneHeightVp: this.topSafeZoneHeightVp
+        })
+        HomeTabSettings({
+          selectedIndex: this.curSelectedTabIndex,
+          appTextSizePlan: this.appTextSizePlan,
+          topSafeZoneHeightVp: this.topSafeZoneHeightVp
+        })
       }
-      .width('100%')
-      .height('100%')
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Center)
-      .margin({
-        top: this.topSafeZoneHeightVp,
-        bottom: this.bottomSafeZoneHeightVp
-      })
+      .layoutWeight(1)
+      .margin({ bottom: this.bottomSafeZoneHeightVp })
+      .vertical(false)
+      .edgeEffect(EdgeEffect.None)
+      .scrollable(true)
+      .onChange((newIndex: number) => this.curSelectedTabIndex = newIndex)
+      .onTabBarClick((newIndex: number) => this.tabsController.changeIndex(newIndex))
     }
     .height('100%')
     .width('100%')
     .hideTitleBar(true)
     .hideToolBar(true)
     .hideBackButton(true)
-    .backgroundColor($r('app.color.main_selected_light_color'))
     .mode(this.navMode)
     .onAppear(() => {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;
