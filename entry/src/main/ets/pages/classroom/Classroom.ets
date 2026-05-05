@@ -14,6 +14,7 @@ import { GLOBAL_APP_SETTINGS_CHANGED_EVENT } from '../../utils/common/GlobalAppS
 import { getScreenBottomSafeZoneHeightPx, getScreenTopSafeZoneHeightPx } from '../../utils/common/ScreenUIAdapter';
 import { ScreenObserver, ScreenStatusInfo } from '../../utils/common/uiobserver/ScreenObserver';
 import window from '@ohos.window';
+import { LocalWebServer } from '../../utils/LocalWebServer';
 
 export namespace Classroom {
   export function go(params: Record<string, ResourceStr | undefined>) {
@@ -77,7 +78,8 @@ struct ClassroomComponent {
     NavDestination() {
       Stack({ alignContent: Alignment.Top }) {
         LHWebView({
-          src: this.url,
+          src: `http://${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}/index.html`,
+          // src: this.url,
           mobileMode: true,
           onControllerAttachedCallback: (webViewController: webview.WebviewController): void => this.onControllerAttachedCallback(webViewController)
         })

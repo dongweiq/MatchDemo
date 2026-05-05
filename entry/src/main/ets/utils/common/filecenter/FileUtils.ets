@@ -113,3 +113,23 @@ export function readRawFileSync<T>(fileName: string): T {
   }
   return BLANK_OBJECT as T;
 }
+
+/**
+ * 读出rawfile文件内容并返回。
+ * @param fileName rawfile文件路径。
+ * @returns 字符串内容。
+ */
+export function justReadRawFileSync(fileName: string): string {
+  let context = GlobalContext.getContext();
+  if (context === undefined) {
+    return '';
+  }
+  try {
+    let rawFile = context.resourceManager.getRawFileContentSync(fileName);
+    let textDecoder = util.TextDecoder.create('UTF-8', { ignoreBOM: true });
+    let fileContent: string = textDecoder.decodeToString(rawFile, { stream: false });
+    return fileContent;
+  } catch (error) {
+  }
+  return '';
+}

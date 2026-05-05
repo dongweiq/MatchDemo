@@ -19,6 +19,7 @@ import { LHAppSettingsTextSizePlanModel } from '../../models/common/LHAppSetting
 import { HomeTabLessons } from './hometabs/HomeTabLessons';
 import { HomeTabNote } from './hometabs/HomeTabNote';
 import { HomeTabSettings } from './hometabs/HomeTabSettings';
+import { LocalWebServer } from '../../utils/LocalWebServer';
 
 /**
  * 事件：物理返回键额外监听。
@@ -153,10 +154,17 @@ struct HomeMain {
     .onAppear(() => {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;
       mainWindow.setWindowLayoutFullScreen(true).catch(() => {});
+
+      LocalWebServer.getInstance().start()
+        .then(() => {
+          console.log(`state === 服务启动成功：${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}`)
+        });
     })
     .onDisAppear(() => {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;
       mainWindow.setWindowLayoutFullScreen(false).catch(() => {});
+
+      LocalWebServer.getInstance().stop();
     })
   }
 

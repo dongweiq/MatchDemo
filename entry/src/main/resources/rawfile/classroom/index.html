@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="http://192.168.3.93:8081/normalize.css" />
+    <link rel="stylesheet" href="http://192.168.3.93:8081/photoSphereViewerCore.index.min.css" />
+
+</head>
+<body>
+<div id="viewer" style="width: 100vw; height: 100vh;"></div>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "http://192.168.3.93:8081/three.module.js",
+            "@photo-sphere-viewer/core": "http://192.168.3.93:8081/photoSphereViewerCore.index.module.js"
+        }
+    }
+</script>
+
+<script type="module">
+    import { Viewer } from '@photo-sphere-viewer/core';
+
+    const viewer = new Viewer({
+        container: document.querySelector('#viewer'),
+        panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
+        crossorigin: 'anonymous',
+        loadingMode: 'mono',
+        navbar: false
+    });
+</script>
+</body>
+</html>

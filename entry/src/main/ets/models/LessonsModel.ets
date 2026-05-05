@@ -35,7 +35,7 @@ const CONTENTS: Array<LessonsModel> = [
 ];
 
 function makeParams(id: number): string {
-  return `resource://rawfile/lesson_template/index.html?lesson_id=${id}`
+  return `resource://rawfile/classroom/index.html?lesson_id=${id}`
 };
 
 export default CONTENTS;
