@@ -75,6 +75,10 @@
     {
       "name": "lesson_big_ben",
       "value": "伦敦-大本钟"
+    },
+    {
+      "name": "lesson_ny_harbor",
+      "value": "纽约海港"
     }
   ]
 }

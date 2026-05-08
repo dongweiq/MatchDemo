@@ -1,4 +1,5 @@
 import { Classroom, LESSON_INFO, LESSON_NAME } from "../pages/classroom/Classroom";
+import { res2string } from "../utils/common/Utils";
 import { LocalWebServer } from "../utils/LocalWebServer";
 
 /**
@@ -28,15 +29,26 @@ const CONTENTS: Array<LessonsModel> = [
     titleText: $r('app.string.lesson_big_ben'),
     action: () => {
       const params: Record<string, ResourceStr | undefined> = {}
-      params[LESSON_INFO] = makeParams(1);
+      params[LESSON_INFO] = makeParams(res2string($r('app.string.lesson_big_ben')));
       params[LESSON_NAME] = $r('app.string.lesson_big_ben');
+      Classroom.go(params);
+    }
+  },
+  {
+    id: 2,
+    titleImg: $r('app.media.ic_lessons_ny_harbor'),
+    titleText: $r('app.string.lesson_ny_harbor'),
+    action: () => {
+      const params: Record<string, ResourceStr | undefined> = {}
+      params[LESSON_INFO] = makeParams(res2string($r('app.string.lesson_ny_harbor')));
+      params[LESSON_NAME] = $r('app.string.lesson_ny_harbor');
       Classroom.go(params);
     }
   },
 ];
 
-function makeParams(id: number): string {
-  return `http://${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}/lesson/index.html?lesson_id=${id}`
+function makeParams(picName: string): string {
+  return `http://${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}/lesson/index.html?pic_name=${picName}`
 };
 
 export default CONTENTS;

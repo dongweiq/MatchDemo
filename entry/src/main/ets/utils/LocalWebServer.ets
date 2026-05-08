@@ -76,10 +76,12 @@ export class LocalWebServer {
       fs.writeSync(normalCssFile.fd, normalCssFileContent);
       fs.closeSync(normalCssFile);
       // 写入图片资源。
-      let demoFile = fs.openSync(this.serverResourcePath + '/伦敦-大本钟.jpg', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-      let demoFileContent = readRawFileResSync('classroom/lessons/伦敦-大本钟.jpg');
-      fs.writeSync(demoFile.fd, demoFileContent.buffer);
-      fs.closeSync(demoFile);
+      ['伦敦-大本钟.jpg', '纽约海港.jpg'].forEach((picName: string) => {
+        let demoFile = fs.openSync(this.serverResourcePath + '/' + picName, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+        let demoFileContent = readRawFileResSync('classroom/lessons/' + picName);
+        fs.writeSync(demoFile.fd, demoFileContent.buffer);
+        fs.closeSync(demoFile);
+      });
     } catch (error) {
     }
   }
@@ -95,7 +97,7 @@ export class LocalWebServer {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="http://${this.ip}:${this.port}/lesson/normalize.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
-
+    <script src="http://${this.ip}:${this.port}/lesson/utils.js"></script>
 </head>
 <body>
 <div id="viewer" style="width: 100vw; height: 100vh;"></div>
@@ -111,9 +113,21 @@ export class LocalWebServer {
 <script type="module">
     import { Viewer } from '@photo-sphere-viewer/core';
 
+    function getParams() {
+        var params = {};
+        window.location.search.substring(1).split('&').forEach(function (param) {
+            var pair = param.split('=');
+            params[pair[0]] = decodeURIComponent(pair[1]);
+        });
+        return params;
+    }
+
+    const params = getParams();
+    const picName = params['pic_name'];
+
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        panorama: 'http://${this.ip}:${this.port}/lesson/伦敦-大本钟.jpg',
+        panorama: 'http://${this.ip}:${this.port}/lesson/' + picName + '.jpg',
         navbar: false
     });
 </script>
