@@ -133,3 +133,21 @@ export function justReadRawFileSync(fileName: string): string {
   }
   return '';
 }
+
+/**
+ * 读出rawfile文件内容并返回。
+ * @param fileName rawfile文件路径。
+ * @returns Uint8Array内容。
+ */
+export function readRawFileResSync(fileName: string): Uint8Array {
+  let context = GlobalContext.getContext();
+  if (context === undefined) {
+    return new Uint8Array();
+  }
+  try {
+    let rawFile = context.resourceManager.getRawFileContentSync(fileName);
+    return rawFile;
+  } catch (error) {
+  }
+  return new Uint8Array();
+}

@@ -78,8 +78,7 @@ struct ClassroomComponent {
     NavDestination() {
       Stack({ alignContent: Alignment.Top }) {
         LHWebView({
-          src: `http://${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}/index.html`,
-          // src: this.url,
+          src: this.url,
           mobileMode: true,
           onControllerAttachedCallback: (webViewController: webview.WebviewController): void => this.onControllerAttachedCallback(webViewController)
         })

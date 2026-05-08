@@ -1,6 +1,6 @@
-import { HttpServer } from '@cxy/webserver';
+import { HttpRequest, HttpResponse, HttpServer, NextFunction } from '@cxy/webserver';
 import { socket } from '@kit.NetworkKit';
-import { justReadRawFileSync } from './common/filecenter/FileUtils';
+import { justReadRawFileSync, readRawFileResSync } from './common/filecenter/FileUtils';
 import { GlobalContext } from './common/GlobalContext';
 import fs from '@ohos.file.fs';
 import { JSON } from '@kit.ArkTS';
@@ -15,7 +15,7 @@ export class LocalWebServer {
 
   public ip: string = '';
 
-  public port: number = 8081;
+  public port: number = 8080;
 
   private constructor() {
     this.server = new HttpServer();
@@ -30,10 +30,10 @@ export class LocalWebServer {
 
   public start(): Promise<void> {
     return new Promise((resolve) => {
-      this.server.startServer(8081)
+      this.server.startServer(this.port)
         .then((startInfo: socket.NetAddress) => {
           this.ip = startInfo.address;
-          this.port = startInfo.port as number ?? 8081
+          this.port = startInfo.port as number ?? 8080
           this.configuration();
           resolve();
         });
@@ -45,13 +45,21 @@ export class LocalWebServer {
   }
 
   private configuration() {
-    this.server.logger({
-      stream: (log: string) => console.log(log)
-    })
+    this.server.logger()
     this.server.cors(); // 支持跨域。
     this.server.auto(); //自动解析。
     this.serverResourcePath = GlobalContext.getContext()?.filesDir + '/www';
-    this.server.serveStatic(this.serverResourcePath);
+    this.server.registerStaticSite('/lesson', this.serverResourcePath, {
+      index: ['index.html'],
+      directoryListing: true
+    });
+    this.server.serveMultiSite(); // 启用多站点服务。
+    this.server.use((req: HttpRequest, res: HttpResponse, next: NextFunction) => {
+      res.setHeader('Cache-Control', 'no-cache');
+      next();
+    });
+
+    // this.server.serveStatic(this.serverResourcePath);
     this.prepareResource();
     this.prepareIndexFile();
   }
@@ -62,27 +70,16 @@ export class LocalWebServer {
       if (!fs.accessSync(this.serverResourcePath, fs.AccessModeType.EXIST)) {
         fs.mkdirSync(this.serverResourcePath);
       }
-      // 写入threeJS。
-      let threeFile = fs.openSync(this.serverResourcePath + '/three.module.js', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-      let threeFileContent = justReadRawFileSync('classroom/includes/three.module.js');
-      fs.writeSync(threeFile.fd, threeFileContent);
-      fs.closeSync(threeFile);
-      // 写入PhotoSphereViewerJS。
-      let sphereFile = fs.openSync(this.serverResourcePath + '/photoSphereViewerCore.index.module.js', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-      let sphereFileContent = justReadRawFileSync('classroom/includes/photoSphereViewerCore.index.module.js');
-      fs.writeSync(sphereFile.fd, sphereFileContent);
-      fs.closeSync(sphereFile);
       // 写入normalizeCss。
       let normalCssFile = fs.openSync(this.serverResourcePath + '/normalize.css', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
       let normalCssFileContent = justReadRawFileSync('classroom/styles/normalize.css');
       fs.writeSync(normalCssFile.fd, normalCssFileContent);
       fs.closeSync(normalCssFile);
-      // 写入photoSphereViewerCoreCss。
-      let sphereCssFile = fs.openSync(this.serverResourcePath + '/photoSphereViewerCore.index.min.css', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-      let sphereCssFileContent = justReadRawFileSync('classroom/styles/photoSphereViewerCore.index.min.css');
-      fs.writeSync(sphereCssFile.fd, sphereCssFileContent);
-      fs.closeSync(sphereCssFile);
-
+      // 写入图片资源。
+      let demoFile = fs.openSync(this.serverResourcePath + '/伦敦-大本钟.jpg', fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+      let demoFileContent = readRawFileResSync('classroom/lessons/伦敦-大本钟.jpg');
+      fs.writeSync(demoFile.fd, demoFileContent.buffer);
+      fs.closeSync(demoFile);
     } catch (error) {
     }
   }
@@ -96,8 +93,8 @@ export class LocalWebServer {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="http://${this.ip}:${this.port}/normalize.css" />
-    <link rel="stylesheet" href="http://${this.ip}:${this.port}/photoSphereViewerCore.index.min.css" />
+    <link rel="stylesheet" href="http://${this.ip}:${this.port}/lesson/normalize.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
 
 </head>
 <body>
@@ -105,8 +102,8 @@ export class LocalWebServer {
 <script type="importmap">
     {
         "imports": {
-            "three": "http://${this.ip}:${this.port}/three.module.js",
-            "@photo-sphere-viewer/core": "http://${this.ip}:${this.port}/photoSphereViewerCore.index.module.js"
+            "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+            "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"
         }
     }
 </script>
@@ -116,9 +113,7 @@ export class LocalWebServer {
 
     const viewer = new Viewer({
         container: document.querySelector('#viewer'),
-        panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
-        crossorigin: 'anonymous',
-        loadingMode: 'mono',
+        panorama: 'http://${this.ip}:${this.port}/lesson/伦敦-大本钟.jpg',
         navbar: false
     });
 </script>
@@ -129,7 +124,6 @@ export class LocalWebServer {
       fs.writeSync(indexFile.fd, indexFileContent);
       fs.closeSync(indexFile);
     } catch (error) {
-      console.log(`state === 异常：${JSON.stringify(error)}`);
     }
   }
 }

@@ -155,10 +155,7 @@ struct HomeMain {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;
       mainWindow.setWindowLayoutFullScreen(true).catch(() => {});
 
-      LocalWebServer.getInstance().start()
-        .then(() => {
-          console.log(`state === 服务启动成功：${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}`)
-        });
+      LocalWebServer.getInstance().start();
     })
     .onDisAppear(() => {
       let mainWindow: window.Window = GlobalConfig.get(GLOBAL_CONFIG_KEY_WINDOW) as window.Window;

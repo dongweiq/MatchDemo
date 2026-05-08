@@ -1,4 +1,5 @@
 import { Classroom, LESSON_INFO, LESSON_NAME } from "../pages/classroom/Classroom";
+import { LocalWebServer } from "../utils/LocalWebServer";
 
 /**
  * 课程数据。
@@ -35,7 +36,7 @@ const CONTENTS: Array<LessonsModel> = [
 ];
 
 function makeParams(id: number): string {
-  return `resource://rawfile/classroom/index.html?lesson_id=${id}`
+  return `http://${LocalWebServer.getInstance().ip}:${LocalWebServer.getInstance().port}/lesson/index.html?lesson_id=${id}`
 };
 
 export default CONTENTS;
