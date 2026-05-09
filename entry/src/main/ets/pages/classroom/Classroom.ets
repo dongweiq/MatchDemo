@@ -14,7 +14,9 @@ import { GLOBAL_APP_SETTINGS_CHANGED_EVENT } from '../../utils/common/GlobalAppS
 import { getScreenBottomSafeZoneHeightPx, getScreenTopSafeZoneHeightPx } from '../../utils/common/ScreenUIAdapter';
 import { ScreenObserver, ScreenStatusInfo } from '../../utils/common/uiobserver/ScreenObserver';
 import window from '@ohos.window';
-import { LocalWebServer } from '../../utils/LocalWebServer';
+import inspector from '@ohos.arkui.inspector';
+import { openCustomDialog } from '../../utils/common/DialogUtils';
+import { TakePhotoDialog } from '../../views/TakePhotoDialog';
 
 export namespace Classroom {
   export function go(params: Record<string, ResourceStr | undefined>) {
@@ -32,6 +34,9 @@ export const LESSON_INFO: string = 'url_params';
 
 /** 课程名称。 */
 export const LESSON_NAME: string = 'lesson_name';
+
+/** 屏幕中WebView组件的ID。 */
+const CLASSROOM_VIEWER_ID: string = 'classroom_viewer';
 
 /**
  * 网页浏览器，基于原生Web组件实现。
@@ -61,6 +66,12 @@ struct ClassroomComponent {
   /** 标题栏可见性。 */
   @State titleVisible: boolean = true;
 
+  /** WebView组件绘制完成监听。 */
+  @State private drawComplete: boolean = false;
+
+  /** WebView组件绘制进度监听。 */
+  private drawListener?: inspector.ComponentObserver;
+
   private onGlobalAppSettingsChangedEvent: Callback<emitter.EventData> = (dataWrap: emitter.EventData) => {
     if (dataWrap.data) {
       let eventType: string = dataWrap.data[GLOBAL_APP_SETTINGS_EVENT_TYPE] as string;
@@ -74,6 +85,10 @@ struct ClassroomComponent {
     }
   };
 
+  private onDrawCompleteCallback: Callback<void> = () => {
+    this.drawComplete = true;
+  };
+
   build() {
     NavDestination() {
       Stack({ alignContent: Alignment.Top }) {
@@ -82,6 +97,7 @@ struct ClassroomComponent {
           mobileMode: true,
           onControllerAttachedCallback: (webViewController: webview.WebviewController): void => this.onControllerAttachedCallback(webViewController)
         })
+          .id(CLASSROOM_VIEWER_ID)
           .width('100%')
           .height('100%')
           .onClick((_: ClickEvent) => {
@@ -92,6 +108,7 @@ struct ClassroomComponent {
             centerTitleText: this.lessonName ?? $r('app.string.browser'),
             centerTitleTextSize: this.appTextSizePlan.unifiedTitleCenterTextSize,
             leftAction: LHCommonTitleBarLeftNavBack,
+            rightAction: (): void => this.TakePhoto(),
             titleBarBg: Color.Transparent
           })
         }
@@ -121,6 +138,8 @@ struct ClassroomComponent {
           }
         }
       });
+      this.drawListener = this.getUIContext().getUIInspector().createComponentObserver(CLASSROOM_VIEWER_ID);
+      this.drawListener.on('draw', this.onDrawCompleteCallback);
     })
     .onBackPressed(() => {
       try {
@@ -135,7 +154,21 @@ struct ClassroomComponent {
     .onDisAppear(() => {
       emitter.off(GLOBAL_APP_SETTINGS_CHANGED_EVENT, this.onGlobalAppSettingsChangedEvent);
       ScreenObserver.unsubscribe(this.getUIContext());
+      this.drawListener?.off('draw', this.onDrawCompleteCallback);
     })
+  }
+
+  /** 截屏保存。 */
+  @Builder
+  private TakePhoto() {
+    if (this.drawComplete) {
+      Image($r('app.media.ic_take_photo_green'))
+        .width(48)
+        .height(48)
+        .padding(12)
+        .objectFit(ImageFit.Contain)
+        .onClick((_: ClickEvent) => this.takePhoto())
+    }
   }
 
   /**
@@ -145,4 +178,24 @@ struct ClassroomComponent {
   private onControllerAttachedCallback(webViewController: webview.WebviewController) {
     this.controller = webViewController;
   }
+
+  /** 拍照保存。 */
+  private takePhoto() {
+    this.getUIContext().getComponentSnapshot().get(CLASSROOM_VIEWER_ID)
+      .then((img: PixelMap) => {
+        openCustomDialog({
+          builder: wrapBuilder(TakePhotoDialogBuilder),
+          data: [img],
+        });
+      })
+      .catch(() => {});
+  }
+}
+
+@Builder
+function TakePhotoDialogBuilder(params: object, closeCallback: Callback<void, void>) {
+  TakePhotoDialog({
+    img: (params as Array<object>)[0] as ESObject as PixelMap,
+    closeCallback: closeCallback
+  })
 }
